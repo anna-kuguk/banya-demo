@@ -145,11 +145,23 @@
   .s2h{font-size:20px;font-weight:700;margin:0 2px 16px;letter-spacing:-.2px;}
 
   .branches{display:grid;gap:14px;margin-bottom:16px;}
+
+  /* Переключатель формата - на всех экранах: показываем одну ветку за раз */
+  .fmtseg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--card-2);
+    border:1px solid var(--line);border-radius:999px;padding:4px;isolation:isolate;margin-bottom:16px;}
+  .fmtseg .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);
+    background:var(--accent);border-radius:999px;z-index:0;box-shadow:0 1px 4px rgba(0,0,0,.15);
+    transition:transform .24s cubic-bezier(.4,0,.2,1);}
+  .fmtseg[data-active="1"] .thumb{transform:translateX(100%);}
+  .fmtseg button{position:relative;z-index:1;border:none;background:none;font:inherit;font-size:14.5px;
+    font-weight:700;color:var(--ink-soft);padding:11px 6px;cursor:pointer;border-radius:999px;
+    transition:color .18s;white-space:nowrap;}
+  .fmtseg button.on{color:var(--accent-ink);}
+  .branch.m-hidden{display:none;}   /* показываем только выбранную ветку */
+
   @media (min-width:640px){
-    #screen2{max-width:880px;}
-    .branches{grid-template-columns:1fr 1fr;align-items:stretch;}
-    /* плашки-подарки разной длины: ровняем высоту, чтобы заголовки ниже стояли на одном уровне */
-    .bgift{min-height:80px;}
+    /* одна колонка на всех устройствах - не растягиваем карточку на всю ширину */
+    #screen2{max-width:560px;}
   }
   .branch{display:flex;flex-direction:column;width:100%;text-align:left;background:var(--card);
     border:1.5px solid var(--line);border-radius:var(--radius);overflow:hidden;padding:0;
@@ -169,6 +181,18 @@
   .blist li{margin-bottom:5px;}
   .bnote{display:block;font-size:12.5px;color:var(--ink-faint);margin-top:13px;padding-top:12px;
     border-top:1px solid var(--line);}
+
+  /* «Что входит» - сворачиваемый блок с деталями */
+  .disc{border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:14px;background:var(--card-2);}
+  .disc summary{cursor:pointer;padding:12px 14px;font-weight:700;font-size:14px;
+    display:flex;justify-content:space-between;align-items:center;list-style:none;}
+  .disc summary::-webkit-details-marker{display:none;}
+  .disc summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:var(--radius-sm);}
+  .disc .chev{color:var(--ink-faint);transition:transform .2s;font-size:17px;line-height:1;}
+  .disc[open] .chev{transform:rotate(90deg);}
+  .disc[open] summary{border-bottom:1px solid var(--line);}
+  .discbody{padding:12px 14px 3px;}
+  .discbody .bnote{margin-top:6px;}
 
   /* Расчёт внутри карточки */
   .bcalc{display:block;margin-top:15px;background:var(--card-2);border:1px solid var(--line);
@@ -464,25 +488,36 @@
 <div class="wrap" id="screen2" hidden>
   <button class="back" id="backCal" type="button">‹ Назад к календарю</button>
   <div class="chip" id="chipWhen">-</div>
-  <h2 class="s2h">Как проведёте баню?</h2>
+  <h2 class="s2h">Выберите формат</h2>
+
+  <div class="fmtseg" id="fmtSeg" data-active="0" role="tablist" aria-label="Формат бани">
+    <span class="thumb" aria-hidden="true"></span>
+    <button type="button" class="on" data-fmt="arenda" role="tab" aria-selected="true">Аренда бани</button>
+    <button type="button" data-fmt="spa" role="tab" aria-selected="false">Спа-программы</button>
+  </div>
 
   <div class="branches">
 
     <!-- Аренда бани -->
-    <div class="branch">
+    <div class="branch" data-branch="arenda">
       <span class="bbanner arenda"></span>
       <div class="bcontent">
         <div class="btop"><span class="bname">Аренда бани</span></div>
         <span class="bsub">Сеанс 3 часа / 1-20 гостей</span>
         <span class="bgift">В подарок - иммерсивное аромапарение и чаепитие с закусками и фермерским мёдом.</span>
-        <div class="bsec"><h4>В вашем распоряжении</h4><p>Парная с панорамным видом на горы, купель с родниковой водой и горячий чан, тёплый инфинити-бассейн, барная и столовая зоны, чилаут с камином, костровая зона и гамаки на террасе, обливные вёдра и душ.</p></div>
-        <div class="bsec"><h4>В стоимость входит</h4><ul class="blist">
-          <li>Иммерсивное аромапарение (не меньше 10 минут).</li>
-          <li>Банный комплект на каждого гостя: полотенце, простынь, шапка, тапочки, натуральная косметика, гигиенический набор, фен, при необходимости одноразовое бельё.</li>
-          <li>Чаепитие с закусками: горный чай, изотоники, фермерский мёд, варенье, орехи, сухофрукты и сезонные фрукты.</li>
-          <li>3 часа отдыха - пространство только для вашей компании.</li>
-        </ul></div>
-        <span class="bnote">Дополнительные услуги пармастеров, бар и кухня, массаж, скрабы оплачиваются отдельно.</span>
+        <details class="disc">
+          <summary>Что входит <span class="chev" aria-hidden="true">›</span></summary>
+          <div class="discbody">
+            <div class="bsec"><h4>В вашем распоряжении</h4><p>Парная с панорамным видом на горы, купель с родниковой водой и горячий чан, тёплый инфинити-бассейн, барная и столовая зоны, чилаут с камином, костровая зона и гамаки на террасе, обливные вёдра и душ.</p></div>
+            <div class="bsec"><h4>В стоимость входит</h4><ul class="blist">
+              <li>Иммерсивное аромапарение (не меньше 10 минут).</li>
+              <li>Банный комплект на каждого гостя: полотенце, простынь, шапка, тапочки, натуральная косметика, гигиенический набор, фен, при необходимости одноразовое бельё.</li>
+              <li>Чаепитие с закусками: горный чай, изотоники, фермерский мёд, варенье, орехи, сухофрукты и сезонные фрукты.</li>
+              <li>3 часа отдыха - пространство только для вашей компании.</li>
+            </ul></div>
+            <span class="bnote">Дополнительные услуги пармастеров, бар и кухня, массаж, скрабы оплачиваются отдельно.</span>
+          </div>
+        </details>
 
         <div class="bcalc">
           <div class="btariff">до 10 гостей - 9 000 ₽ / гость<span class="bt2">от 10 гостей - 7 000 ₽ / гость</span></div>
@@ -507,28 +542,33 @@
             <span class="btv" id="arendaTotal">18 000 ₽</span>
           </div>
           <div class="bcalcline" id="arendaCalc">2 взр × 9 000 ₽</div>
-          <button class="pay" id="arendaBtn" type="button">Продолжить</button>
+          <button class="pay" id="arendaBtn" type="button">Выбрать аренду</button>
         </div>
       </div>
     </div>
 
     <!-- Спа-программы -->
-    <div class="branch">
+    <div class="branch m-hidden" data-branch="spa">
       <span class="bbanner spa"></span>
       <div class="bcontent">
         <div class="btop"><span class="bname">Спа-программы</span></div>
         <span class="bsub">Сеанс 3 часа / 1-20 гостей</span>
         <span class="bgift">Каждая программа воздействует на 5 органов чувств - осязание, обоняние, слух, вкус и зрение. Даже горы за окном - часть сценария.</span>
-        <div class="bsec"><h4>В вашем распоряжении</h4><p>Парная с панорамным видом на горы, купель с родниковой водой и горячий чан, тёплый инфинити-бассейн, барная и столовая зоны, чилаут с камином, костровая зона и гамаки на террасе, обливные вёдра и душ.</p></div>
-        <div class="bsec"><h4>В стоимость входит</h4><ul class="blist">
-          <li>Иммерсивная программа парения с контрастами: правильный пар, ледяная родниковая вода, горячий чан, тёплый бассейн.</li>
-          <li>Сценарий под ваш повод: восстановление после склона, вечер вдвоём, компания или семейная баня.</li>
-          <li>Полное сопровождение пармастера - он ведёт сеанс как дирижёр: пар, веники, саундхилинг, контрасты и паузы у камина. Каждый следующий шаг - ровно тогда, когда тело к нему готово.</li>
-          <li>Банный комплект на каждого гостя: уютный халат, полотенце, простынь, шапка, тапочки, натуральная косметика, гигиенический набор, фен, при необходимости одноразовое бельё.</li>
-          <li>Чаепитие с закусками - своё под каждую программу: горный чай, изотоники, фермерский мёд, варенье, орехи, сухофрукты и сезонные фрукты.</li>
-          <li>3 часа - всё пространство только для вашей компании.</li>
-        </ul></div>
-        <span class="bnote">Бар, кухня и дополнительные услуги оплачиваются отдельно.</span>
+        <details class="disc">
+          <summary>Что входит <span class="chev" aria-hidden="true">›</span></summary>
+          <div class="discbody">
+            <div class="bsec"><h4>В вашем распоряжении</h4><p>Парная с панорамным видом на горы, купель с родниковой водой и горячий чан, тёплый инфинити-бассейн, барная и столовая зоны, чилаут с камином, костровая зона и гамаки на террасе, обливные вёдра и душ.</p></div>
+            <div class="bsec"><h4>В стоимость входит</h4><ul class="blist">
+              <li>Иммерсивная программа парения с контрастами: правильный пар, ледяная родниковая вода, горячий чан, тёплый бассейн.</li>
+              <li>Сценарий под ваш повод: восстановление после склона, вечер вдвоём, компания или семейная баня.</li>
+              <li>Полное сопровождение пармастера - он ведёт сеанс как дирижёр: пар, веники, саундхилинг, контрасты и паузы у камина. Каждый следующий шаг - ровно тогда, когда тело к нему готово.</li>
+              <li>Банный комплект на каждого гостя: уютный халат, полотенце, простынь, шапка, тапочки, натуральная косметика, гигиенический набор, фен, при необходимости одноразовое бельё.</li>
+              <li>Чаепитие с закусками - своё под каждую программу: горный чай, изотоники, фермерский мёд, варенье, орехи, сухофрукты и сезонные фрукты.</li>
+              <li>3 часа - всё пространство только для вашей компании.</li>
+            </ul></div>
+            <span class="bnote">Бар, кухня и дополнительные услуги оплачиваются отдельно.</span>
+          </div>
+        </details>
 
         <div class="bcalc">
           <div class="btariff">от 15 000 ₽ / гость<span class="bt2">точная цена зависит от программы и числа гостей</span></div>
@@ -1040,6 +1080,8 @@
     chipWhen.textContent = label(y, m, d) + " · " + SLOTS[slotIndex] + " · 3 часа" + (morning ? " · утро -15%" : "");
     updateGuestsUI();
     recalc();
+    setFormat("arenda");   // при каждом открытии экрана начинаем с «Аренды»
+    document.querySelectorAll("#screen2 .disc[open]").forEach(function (d) { d.open = false; });
     contNote.textContent = "";
     screen1.hidden = true;
     screen2.hidden = false;
@@ -1647,6 +1689,26 @@
   gPlus.addEventListener("click", function () { changeAdults(1); });
   cMinus.addEventListener("click", function () { changeChildren(-1); });
   cPlus.addEventListener("click", function () { changeChildren(1); });
+  // Переключатель формата (Аренда / Спа) - показывает одну ветку за раз
+  var fmtSeg = $("fmtSeg");
+  function setFormat(fmt) {
+    if (!fmtSeg) return;
+    fmtSeg.setAttribute("data-active", fmt === "spa" ? "1" : "0");
+    fmtSeg.querySelectorAll("button").forEach(function (b) {
+      var on = b.getAttribute("data-fmt") === fmt;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    document.querySelectorAll("#screen2 .branch").forEach(function (br) {
+      br.classList.toggle("m-hidden", br.getAttribute("data-branch") !== fmt);
+    });
+  }
+  if (fmtSeg) {
+    fmtSeg.querySelectorAll("button").forEach(function (btn) {
+      btn.addEventListener("click", function () { setFormat(btn.getAttribute("data-fmt")); });
+    });
+  }
+
   $("arendaBtn").addEventListener("click", function () { state.program = null; openScreen3(); });
   $("spaBtn").addEventListener("click", openProg);
   $("backProg").addEventListener("click", backFromProg);
