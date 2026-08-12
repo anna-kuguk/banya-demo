@@ -761,7 +761,15 @@
 (function () {
   "use strict";
 
-  var NOM = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+  // Шаги воронки в Яндекс.Метрике: каждый экран - своя цель, чтобы видеть,
+  // до какого шага гость дошёл и где вышел. Счётчик может не загрузиться
+  // (блокировщик, нет сети) - тогда просто молчим, макет работает как прежде.
+  function goal(name) {
+    try { if (typeof window.ym === "function") window.ym(111520269, "reachGoal", name); }
+    catch (e) { /* аналитика никогда не ломает бронь */ }
+  }
+
+  var NOM =["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
   var GEN = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
   var DOW = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
   var SLOTS = ["09:00-12:00", "13:00-16:00", "17:00-20:00", "21:00-00:00"];
@@ -1102,6 +1110,7 @@
     contNote.textContent = "";
     screen1.hidden = true;
     screen2.hidden = false;
+    goal("step_format");
     if (typeof window !== "undefined" && window.scrollTo) window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -1263,6 +1272,7 @@
     renderProgs();
     screen2.hidden = true;
     screenProg.hidden = false;
+    goal("step_program");
     if (typeof window !== "undefined" && window.scrollTo) window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -1473,6 +1483,7 @@
     screen2.hidden = true;
     screenProg.hidden = true;
     screen3.hidden = false;
+    goal("step_guests");
     if (typeof window !== "undefined" && window.scrollTo) window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -1552,6 +1563,7 @@
     cancelHold();
     if (paid) return;
     holdOverlay.hidden = false;
+    goal("hold_expired");
   }
 
   // --- контакты и валидация ---
@@ -1613,6 +1625,7 @@
     screen3.hidden = true;
     screen5.hidden = true;
     screen4.hidden = false;
+    goal("step_contacts");
     if (!hold.active && !paid) startHold();
     if (typeof window !== "undefined" && window.scrollTo) window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1633,6 +1646,7 @@
     tickHold();
     screen4.hidden = true;
     screen5.hidden = false;
+    goal("step_payment");
     if (typeof window !== "undefined" && window.scrollTo) window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -1675,6 +1689,7 @@
     screen4.hidden = true;
     screen5.hidden = true;
     screen6.hidden = false;
+    goal("booking_done");
     if (typeof window !== "undefined" && window.scrollTo) window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -1794,6 +1809,7 @@
     if (!exitEligible()) return;
     exitShown = true;
     exitOverlay.hidden = false;
+    goal("exit_intent");
   }
   function hideExitPopup() { exitOverlay.hidden = true; }
 
